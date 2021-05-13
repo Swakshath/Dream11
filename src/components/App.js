@@ -8,6 +8,10 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import Table from 'react-bootstrap/Table'
 import Web3 from 'web3'
 import Betting from '../abis/Betting.json'
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import Contests from './Contests.js'
+
 var getdata = require('./teams.json')
 
 
@@ -58,13 +62,17 @@ class App extends Component {
     const bettingdata = await Betting.networks[networkId];
     if(bettingdata) {
       const betting = new web3.eth.Contract(Betting.abi, bettingdata.address)
+      console.log('bad'+bettingdata.address)
       this.setState({betting});
-      
+
       var contestid = await betting.methods.contestid.call();
       this.setState({contid:contestid})
       this.setState({isLoading:false})
     
       console.log('con'+contestid)
+
+      var teamsc = await betting.methods.contests(1).call();
+      console.log('connn'+teamsc)
     } else
     {
       alert("Contract not deployed")
@@ -113,7 +121,7 @@ class App extends Component {
   joincontest = () => {
     this.setState({ isLoading: true });
     this.state.web3.eth.sendTransaction({to: this.state.betting.address, from: this.state.account, value: this.state.web3.utils.toWei('2')}).on('transactionHash', (hash) => {
-      this.state.betting.methods.joincontest((this.state.contid), (this.state.playersttoval)).send({ from: this.state.account }).on('transactionHash', (hash) => {
+      this.state.betting.methods.joincontest((this.state.contid.toString()), (this.state.playersttoval.toString())).send({ from: this.state.account }).on('transactionHash', (hash) => {
         this.setState({isLoading:false})
       })
      } )
@@ -122,7 +130,7 @@ class App extends Component {
 
   getmoney = () => {
     this.setState({isLoading:true});
-    this.state.betting.methods.sendwinner().send({from: this.state.account}).on('transactionHash', (hash) => {
+    this.state.betting.methods.sendwinner(this.state.account).send({from: this.state.account}).on('transactionHash', (hash) => {
       this.setState({isLoading:false})
     }) 
   }
@@ -148,11 +156,11 @@ class App extends Component {
         </InputGroup>)    */
     <tr>
       <td 
-        width="5%"><InputGroup.Prepend><div className={!this.state.playerselected?'uncheckclass':'checkclass'}><InputGroup.Checkbox /*{!this.state.playerselected?'op':'checkclass'}*/ id={"a"+index} value={index+1} 
+        width="5%"><InputGroup.Prepend><div className={!this.state.playerselected?'uncheckclass':'checkclass'}><InputGroup.Checkbox /*{!this.state.playerselected?'op':'checkclass'}*/ id={"a"+index} value={2**(index)} 
         onClick={this.handleChange} /*disabled={( this.state.playerselected && (!this.checked))?true:false}*//></div>
         </InputGroup.Prepend></td>
       <td style={{width:"45%"}}>{element}</td>
-      <td width="5%"><InputGroup.Prepend><div className={!this.state.playerselected?'uncheckclass':'checkclass'}><InputGroup.Checkbox id={"b"+index} value={index+11} onClick={this.handleChange} /*disabled={( this.state.playerselected && (!this.checked))?true:false}*//>
+      <td width="5%"><InputGroup.Prepend><div className={!this.state.playerselected?'uncheckclass':'checkclass'}><InputGroup.Checkbox id={"b"+index} value={2**(index+11)} onClick={this.handleChange} /*disabled={( this.state.playerselected && (!this.checked))?true:false}*//>
       </div>
       </InputGroup.Prepend></td>
       <td style={{width:"45%"}}>{getdata['Team2'][index]}</td>
@@ -173,6 +181,7 @@ return(
 )
     return (
       <div>
+        <Router>
         <Form id="selplayers">
           <Table style={{width:"50%"}} striped bordered >
           <thead>
@@ -193,6 +202,11 @@ return(
         {this.state.playersttoval}
 
         <Button variant="primary" onClick={this.getmoney}>Get My Money</Button>
+      <Contests data={this.state} />
+      
+        <Link to="/contests">Go</Link>
+        <Route exact path = '/contests' render={() => <Contests data={this.state} />}></Route>
+      </Router>
       </div>
     );
 
