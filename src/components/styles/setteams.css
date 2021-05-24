@@ -1,0 +1,27 @@
+.forminput {
+    color:white;
+    width:50%;
+    float:right;
+}
+
+.table {
+    color: black;
+    background-color: white;
+}
+
+.pageheading {
+    color:white;
+    padding-left:10px;
+    float:left;
+    width:50%;
+    display: flex;
+    justify-content: center;
+}
+
+.setteams {
+    padding:5px;
+}
+
+.playertable {
+
+}

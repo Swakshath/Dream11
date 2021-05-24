@@ -53,19 +53,25 @@ contract Betting is Ownable {
         emit contestentereds(_contestid, _teams, _matchid);
     }
 
-    function sendwinner(address payable _winner) public payable {
-       _winner.transfer(1 ether);
+    function sendwinner(address payable _winner, uint _matchid, uint _contestid) public payable onlyOwner{
+       uint amount = (matches[_matchid].contests[_contestid].users);
+       uint tosend = amount*(1.8 ether);
+       _winner.transfer(tosend);
             }
 
     function getcontests(uint _matchid) public view returns(uint) {
         return(matches[_matchid].contestid);
     }
 
-    /*function getplayerteams(uint _contestid, uint _playernum) public view returns(uint64, address) {
-        return (contests[_contestid].teamsmap[playersaddrs[_contestid][_playernum]], playersaddrs[_contestid][_playernum]);
+    function getusers(uint _matchid, uint _contestid) public view returns(uint){
+        return(matches[_matchid].contests[_contestid].users);
+    }
+
+    function getplayerteams(uint _contestid, uint _matchid, uint _playernum) public view returns(uint64, address) {
+        return (matches[_matchid].contests[_contestid].teamsmap[playersaddrs[_matchid][_contestid][_playernum]], playersaddrs[_matchid][_contestid][_playernum]);
         //return contests[0].teamsmap[playersaddrs[0][1]];
         //return playersaddrs[_contestid][_playernum];
-    }*/
+    }
 
     function createcontest(uint _matchid) public {
         
@@ -76,7 +82,7 @@ contract Betting is Ownable {
 
     }
 
-    function addmatch(uint _matchid) public onlyOwner{
+    function addmatch(uint _matchid) public onlyOwner {
         matches[_matchid].contestid=0;
         matches[_matchid].contests[0].users=1;
         playersaddrs.push([[address(0)]]);

@@ -7,6 +7,9 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Contests from './Contests.js'
 import Setteams from './Setteams.js'
 import Matches from './Matches';
+import Creatematch from './Creatematch';
+import backgroundimg from './styles/redbg.webp'
+import Sendmoney from './Sendmoney';
 
 class App extends Component {
 
@@ -64,28 +67,24 @@ class App extends Component {
 
   
   render() {
-    
-    
-
-    
-    
-
-if(this.state.isLoading)
-return(
-  <div>
-    Loading...
-  </div>
-)
+  
+    if(this.state.isLoading)
+    {
+      return(
+        <div>
+          Loading...
+        </div>
+      )
+    }
+  
     return (
       <div>
         <Router>
-        
-      <Link to='/teams'>Teams</Link>
-        <Link to="/contests">Go</Link>
-        <Link to="/matches">Matches</Link>
         <Route exact path = '/contests/:matchid' render={() => <Contests data={this.state} />}></Route>
         <Route exact path = '/teams/:matchid/:contid' render={() => <Setteams data={this.state} />}></Route>
-      <Route exact path = '/matches' render={() => <Matches data={this.state} />}></Route>
+      <Route exact path = '/' render={() => <Matches data={this.state} />}></Route>
+      <Route exact path = '/sendmoney' render={() => <Sendmoney data={this.state} />}></Route>
+      <Route exact path ='/sendmatch' component={Creatematch}></Route>
       </Router>
 
 

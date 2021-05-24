@@ -8,6 +8,10 @@ import { Checkbox} from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup'
 import Table from 'react-bootstrap/Table'
 import { withRouter } from "react-router";
+import './styles/setteams.css';
+import Modal from 'react-bootstrap/Modal'
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav'
 
 var getdata = require('./teams.json')
 
@@ -23,7 +27,8 @@ class Setteams extends Component {
             playersttoval:0,
             contid:this.props.match.params.contid,
             isLoading:true,
-            urlmatch:this.props.match.params.matchid            
+            urlmatch:this.props.match.params.matchid,
+            teamsselected:false            
         }
     }
 
@@ -83,7 +88,8 @@ class Setteams extends Component {
       joincontest = () => {
         this.setState({ isLoading: true });
         this.props.data.web3.eth.sendTransaction({to: this.props.data.betting.address, from: this.props.data.account, value: this.props.data.web3.utils.toWei('2')}).on('transactionHash', (hash) => {
-          this.props.data.betting.methods.joincontest(/*(this.state.contid.toString()),(this.state.urlmatch.toString()), (this.state.playersttoval.toString())*/0, 0, 40).send({ from: this.props.data.account }).on('transactionHash', (hash) => {
+          this.props.data.betting.methods.joincontest((this.state.contid.toString()),(this.state.urlmatch.toString()), (this.state.playersttoval.toString())).send({ from: this.props.data.account }).on('transactionHash', (hash) => {
+            this.setState({teamsselected:true});
             this.setState({isLoading:false})
           })
          } )
@@ -117,10 +123,12 @@ class Setteams extends Component {
         width="5%"><InputGroup.Prepend><div className={!this.state.playerselected?'uncheckclass':'checkclass'}><InputGroup.Checkbox /*{!this.state.playerselected?'op':'checkclass'}*/ id={"a"+index} value={2**(index)} 
         onClick={this.handleChange} /*disabled={( this.state.playerselected && (!this.checked))?true:false}*//></div>
         </InputGroup.Prepend></td>
+        <td>{index}</td>
       <td style={{width:"45%"}}>{element}</td>
       <td width="5%"><InputGroup.Prepend><div className={!this.state.playerselected?'uncheckclass':'checkclass'}><InputGroup.Checkbox id={"b"+index} value={2**(index+11)} onClick={this.handleChange} /*disabled={( this.state.playerselected && (!this.checked))?true:false}*//>
       </div>
       </InputGroup.Prepend></td>
+      <td>{index+11}</td>
       <td style={{width:"45%"}}>{getdata['Team2'][index]}</td>
     </tr>
   
@@ -130,7 +138,7 @@ class Setteams extends Component {
     
 console.log('jscount'+(++playerscount))
 console.log('checkc'+playerscount)
-
+const handleClose = () => window.location.replace('/');
 
 if(this.state.isLoading)
 return(
@@ -140,13 +148,33 @@ return(
 )
         return(
             <div>
+                <Navbar className="navpage">
+    <Navbar.Brand href="/" style={{'color':'#dc143c', 'font-size':'50px'}}>
+    
+     OPFantasy
+    </Navbar.Brand>
+  </Navbar>
+  <div className="setteams">
+              <div className="pageheading">
+                Match ID: {this.state.urlmatch}<br>
+                </br>
+                Contest ID: {this.state.contid}
+              <br></br>
+              Select 3 players and join the contest! 
+              </div>
+              <div className="info">
+                
+              </div>
+              <div className="forminput">
                 <Form id="selplayers">
-          <Table style={{width:"50%"}} striped bordered >
+          <Table style={{width:"50%"}} striped bordered className="playertable">
           <thead>
     <tr>
-      <th>Team1</th>
+      <th width="100%">Team1</th>
+      <th>ID</th>
       <th>players</th>
       <th>Team2</th>
+      <th>ID</th>
       <th>players</th>
     </tr>
   </thead>
@@ -154,12 +182,24 @@ return(
         {team1}
       </tbody>
         </Table>
-        <Button variant="primary" onClick={this.joincontest} disabled={!this.state.playerselected}>Join Contest</Button>
+        <Button variant="danger" onClick={this.joincontest} disabled={!this.state.playerselected}>Join Contest</Button>
         </Form>
-        {this.state.playerselected.toString()}
-        {this.state.playersttoval}
-
-        <Button variant="primary" onClick={this.getmoney}>Get My Money</Button>
+        </div>
+        <Modal show={this.state.teamsselected} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Contest Joined!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>All the best!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      </div>
+      <div class="footer">
+  <p style={{'float':'right'}}>Created by Swaky</p>
+</div>
             </div>
         )
     }
